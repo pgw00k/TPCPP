@@ -1,0 +1,16 @@
+#忽略如下几个目录(通用目录)
+/.vs/
+/Binaries/
+/Intermediate/
+/Saved/
+
+#忽略个别资源目录
+/Content/Animation/
+/Content/ThirdPersonCPP/Maps/
+/Content/ThirdPerson/Meshes/
+/Content/Geometry/
+/Content/Mannequin
+
+#忽略个别文件
+#地图环境光照构建文件
+*__BuiltData.uasset
