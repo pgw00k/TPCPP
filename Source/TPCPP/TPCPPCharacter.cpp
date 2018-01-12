@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine.h"
+#include "Kismet/KismetMathLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPCPPCharacter
@@ -83,6 +84,8 @@ void ATPCPPCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 
 	// My AdvanceControl
 	PlayerInputComponent->BindAction("Boost", IE_Pressed, this, &ATPCPPCharacter::BoostStart);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPCPPCharacter::AimStart);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATPCPPCharacter::AimEnd);
 }
 
 
@@ -111,6 +114,22 @@ void ATPCPPCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ATPCPPCharacter::AddControllerYawInput(float Value)
+{
+	if (!isAiming)
+	{
+		APawn::AddControllerYawInput(Value);
+	}
+}
+
+void ATPCPPCharacter::AddControllerPitchInput(float Value)
+{
+	if (!isAiming)
+	{
+		APawn::AddControllerPitchInput(Value);
+	}
 }
 
 void ATPCPPCharacter::MoveForward(float Value)
@@ -155,6 +174,11 @@ void ATPCPPCharacter::Tick(float DeltaTime)
 		}
 		BoostEnd();
 	}
+
+	if (isAiming)
+	{
+		Aim();
+	}
 }
 
 void ATPCPPCharacter::BoostStart()
@@ -187,4 +211,28 @@ void ATPCPPCharacter::BoostEnd()
 		isBoosting = false;
 	}
 
+}
+
+void ATPCPPCharacter::AimStart()
+{
+	isAiming = true;
+	FollowCamera->bUsePawnControlRotation = true;
+}
+
+void ATPCPPCharacter::AimEnd()
+{
+	isAiming = false;
+	FollowCamera->bUsePawnControlRotation = false;
+}
+
+void ATPCPPCharacter::Aim()
+{
+	if (IsValid(Target))
+	{
+		FRotator Rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
+		Controller->SetControlRotation(Rot);
+		Rot.Pitch = 0;
+		SetActorRelativeRotation(Rot);
+		
+	}
 }

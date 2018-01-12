@@ -21,10 +21,17 @@ class ATPCPPCharacter : public ACharacter
 public:
 	ATPCPPCharacter();
 
+	void ATPCPPCharacter::AddControllerYawInput(float Value);
+	void ATPCPPCharacter::AddControllerPitchInput(float Value);
+
 	void ATPCPPCharacter::Tick(float DeltaTime);
 	void BoostStart();
 	void Boosting(float Deltatime);
 	void BoostEnd();
+
+	void ATPCPPCharacter::AimStart();
+	void ATPCPPCharacter::AimEnd();
+	void ATPCPPCharacter::Aim();
 	
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -49,6 +56,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = CharacterBoost)
 		float BoostDistance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CharacterAim)
+		bool isAiming;
+	UPROPERTY(EditAnywhere, Category = CharacterAim)
+		class AActor* Target;
+
 
 
 protected:
