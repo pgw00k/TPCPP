@@ -216,7 +216,7 @@ void ATPCPPCharacter::BoostEnd()
 void ATPCPPCharacter::AimStart()
 {
 	isAiming = true;
-	FollowCamera->bUsePawnControlRotation = true;
+	//FollowCamera->bUsePawnControlRotation = true;
 }
 
 void ATPCPPCharacter::AimEnd()
@@ -230,7 +230,7 @@ void ATPCPPCharacter::Aim()
 	if (IsValid(Target))
 	{
 		FRotator Rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
-		Controller->SetControlRotation(Rot);
+		Controller->SetControlRotation(Rot+CameraOffset);
 		Rot.Pitch = 0;
 		SetActorRelativeRotation(Rot);
 		

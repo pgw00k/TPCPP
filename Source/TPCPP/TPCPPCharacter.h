@@ -62,6 +62,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = CharacterAim)
 		class AActor* Target;
 
+	UPROPERTY(EditAnywhere, Category = CharacterAim)
+		FRotator CameraOffset;
+
 
 
 protected:
