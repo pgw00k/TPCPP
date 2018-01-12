@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Engine.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPCPPCharacter
@@ -45,6 +46,11 @@ ATPCPPCharacter::ATPCPPCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	// Set boost default value
+	BoostDistance = 600;
+	BoostSpeed = 20;
+	BoostTime = 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +80,9 @@ void ATPCPPCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATPCPPCharacter::OnResetVR);
+
+	// My AdvanceControl
+	PlayerInputComponent->BindAction("Boost", IE_Pressed, this, &ATPCPPCharacter::BoostStart);
 }
 
 
@@ -106,7 +115,7 @@ void ATPCPPCharacter::LookUpAtRate(float Rate)
 
 void ATPCPPCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != NULL) && (Value != 0.0f)&& !isBoosting)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -120,7 +129,7 @@ void ATPCPPCharacter::MoveForward(float Value)
 
 void ATPCPPCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ( (Controller != NULL) && (Value != 0.0f) && !isBoosting)
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -131,4 +140,51 @@ void ATPCPPCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ATPCPPCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (isBoosting) 
+	{
+		FHitResult HitResult;
+		SetActorLocation(FMath::VInterpTo(GetActorLocation(), BoostEndTarget, DeltaTime, BoostSpeed),true,&HitResult);
+		if (HitResult.IsValidBlockingHit())
+		{
+			isBoosting = false;
+		}
+		BoostEnd();
+	}
+}
+
+void ATPCPPCharacter::BoostStart()
+{
+	if (isBoosting == false)
+	{
+		isBoosting = true;
+		BoostEndTarget = GetActorForwardVector()*BoostDistance + GetActorLocation();
+		BoostEndTarget.Z = GetActorForwardVector().Z + GetActorLocation().Z;
+
+		//BoostEndTarget = FVector::FVector(
+		//	GetActorForwardVector().X*BoostDistance + GetActorLocation().X,
+		//	GetActorForwardVector().Y*BoostDistance + GetActorLocation().Y,
+		//	GetActorForwardVector().Z + GetActorLocation().Z
+		//);
+
+	}
+}
+
+void ATPCPPCharacter::Boosting(float Deltatime)
+{
+	
+	
+}
+
+void ATPCPPCharacter::BoostEnd()
+{
+	if (FVector::Distance(GetActorLocation(), BoostEndTarget) < 50 && isBoosting)
+	{
+		isBoosting = false;
+	}
+
 }

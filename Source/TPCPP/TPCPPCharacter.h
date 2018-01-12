@@ -21,6 +21,12 @@ class ATPCPPCharacter : public ACharacter
 public:
 	ATPCPPCharacter();
 
+	void ATPCPPCharacter::Tick(float DeltaTime);
+	void BoostStart();
+	void Boosting(float Deltatime);
+	void BoostEnd();
+	
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -28,6 +34,22 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = CharacterBoost)
+		bool isBoosting;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = CharacterBoost)
+		FVector BoostEndTarget;
+
+	UPROPERTY(EditAnywhere, Category = CharacterBoost)
+		float BoostSpeed;
+
+	UPROPERTY(EditAnywhere, Category = CharacterBoost)
+		float BoostTime;
+
+	UPROPERTY(EditAnywhere, Category = CharacterBoost)
+		float BoostDistance;
+
 
 protected:
 
